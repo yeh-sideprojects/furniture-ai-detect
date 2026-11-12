@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>智鑑家具 SmartInspect | 二手家具遠端智慧質檢系統</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    body { 
+      font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif; 
+      background-color: #EBEBEB; 
+      color: #111111; 
+      -webkit-tap-highlight-color: transparent;
+    }
+    .ikea-blue { background-color: #0058A3; }
+    .ikea-yellow { background-color: #FFDB00; }
+    .ikea-gray { background-color: #F5F5F5; }
+  </style>
+</head>
+<body class="h-[100dvh] w-screen flex justify-center select-none overflow-hidden">
+
+  <div class="w-full max-w-md h-full bg-white flex flex-col justify-between overflow-hidden shadow-sm relative">
+
+    <header class="px-4 py-3 border-b border-neutral-200 flex items-center justify-between bg-white z-20 shrink-0">
+      <div class="flex items-center gap-2">
+        <div class="ikea-blue px-2 py-0.5 rounded font-black text-xs tracking-wider text-[#FFDB00]">IKEA</div>
+        <span class="text-sm font-bold text-neutral-900">智鑑家具</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="openGuideModal()" class="text-xs font-medium text-neutral-600 hover:text-black">使用教學</button>
+        <button onclick="toggleModal('inspiration-modal', true)" class="text-xs font-medium text-neutral-600 hover:text-black">專案靈感</button>
+        <button onclick="toggleModal('ios-modal', true)" class="text-xs font-medium text-[#0058A3]">加入主畫面</button>
+      </div>
+    </header>
+
+    <div id="guide-modal" class="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-5">
+      <div class="bg-white w-full max-w-sm rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+        <div class="flex justify-between items-center">
+          <span id="slide-tag" class="text-xs font-bold px-2.5 py-1 rounded ikea-yellow text-neutral-900">步驟 1 / 3</span>
+          <button onclick="toggleModal('guide-modal', false)" class="text-neutral-400 hover:text-black text-sm font-bold">跳過 ✕</button>
+        </div>
+
+        <div id="slide-1" class="py-4 text-center space-y-3">
+          <div class="w-full h-36 ikea-gray rounded-xl flex items-center justify-center p-4">
+            <svg viewBox="0 0 200 120" class="w-44 h-28 stroke-[#0058A3] fill-none" stroke-width="2.5">
+              <rect x="55" y="12" width="90" height="96" rx="10" class="stroke-neutral-800" fill="#FFFFFF"/>
+              <path d="M 70 40 L 70 30 L 80 30 M 130 30 L 120 30 M 130 30 L 130 40 M 70 80 L 70 90 L 80 90 M 130 80 L 130 90 L 120 90" stroke="#0058A3" stroke-width="2.5" stroke-linecap="round"/>
+              <rect x="78" y="46" width="44" height="28" rx="3" stroke-dasharray="4,3"/>
+              <circle cx="158" cy="28" r="10" fill="#FFDB00" class="stroke-amber-500"/>
+            </svg>
+          </div>
+          <h3 class="text-base font-bold text-neutral-900">把品質控制移到拍照當下</h3>
+          <p class="text-xs text-neutral-600 leading-relaxed">
+            系統會即時偵測環境光線並提供對齊輔助框，解決過往民眾自拍照片角度、距離與光線不一的問題。
+          </p>
+        </div>
+
+        <div id="slide-2" class="hidden py-4 text-center space-y-3">
+          <div class="w-full h-36 ikea-gray rounded-xl flex items-center justify-center p-4">
+            <svg viewBox="0 0 200 120" class="w-44 h-28 fill-none">
+              <rect x="55" y="25" width="90" height="70" rx="6" class="stroke-neutral-700" stroke-width="2" fill="#FFFFFF"/>
+              <text x="100" y="64" text-anchor="middle" class="fill-[#0058A3] text-[11px] font-bold">1. 桌面整體</text>
+              <circle cx="55" cy="25" r="9" fill="#0058A3"/><text x="55" y="29" text-anchor="middle" class="fill-white text-[10px] font-bold">2</text>
+              <circle cx="145" cy="25" r="9" fill="#0058A3"/><text x="145" y="29" text-anchor="middle" class="fill-white text-[10px] font-bold">3</text>
+              <circle cx="145" cy="95" r="9" fill="#0058A3"/><text x="145" y="99" text-anchor="middle" class="fill-white text-[10px] font-bold">4</text>
+              <circle cx="55" cy="95" r="9" fill="#0058A3"/><text x="55" y="99" text-anchor="middle" class="fill-white text-[10px] font-bold">5</text>
+            </svg>
+          </div>
+          <h3 class="text-base font-bold text-neutral-900">1 張桌面整體 ＋ 4 張桌角特寫</h3>
+          <p class="text-xs text-neutral-600 leading-relaxed">
+            依序拍攝桌面俯視圖與四個桌角（左前、左後、右後、右前），全面檢查結構接縫、表面刮痕與受潮起泡。
+          </p>
+        </div>
+
+        <div id="slide-3" class="hidden py-4 text-center space-y-3">
+          <div class="w-full h-36 ikea-gray rounded-xl flex items-center justify-center p-4">
+            <svg viewBox="0 0 220 120" class="w-48 h-28 fill-none">
+              <rect x="12" y="28" width="58" height="64" rx="6" fill="#FFFFFF" class="stroke-[#0058A3]" stroke-width="2"/>
+              <text x="41" y="52" text-anchor="middle" class="fill-[#0058A3] text-[10px] font-bold">PASS</text>
+              <text x="41" y="72" text-anchor="middle" class="fill-neutral-700 text-[9px]">核發折價券</text>
+              <rect x="81" y="28" width="58" height="64" rx="6" fill="#FFFFFF" class="stroke-amber-500" stroke-width="2"/>
+              <text x="110" y="52" text-anchor="middle" class="fill-amber-600 text-[10px] font-bold">REVIEW</text>
+              <text x="110" y="72" text-anchor="middle" class="fill-neutral-700 text-[9px]">補拍轉人工</text>
+              <rect x="150" y="28" width="58" height="64" rx="6" fill="#FFFFFF" class="stroke-red-500" stroke-width="2"/>
+              <text x="179" y="52" text-anchor="middle" class="fill-red-600 text-[10px] font-bold">REJECT</text>
+              <text x="179" y="72" text-anchor="middle" class="fill-neutral-700 text-[9px]">維修或清運</text>
+            </svg>
+          </div>
+          <h3 class="text-base font-bold text-neutral-900">AI 三級分流與低碳循環獎勵</h3>
+          <p class="text-xs text-neutral-600 leading-relaxed">
+            良品直接試算收購價並提供門市自送加碼；疑慮案例精準引導補拍；報廢品分流至零件維修或環保清運，避免白跑一趟。
+          </p>
+        </div>
+
+        <div class="space-y-4 pt-2">
+          <div class="flex justify-center gap-2">
+            <span id="dot-0" class="w-5 h-1.5 rounded-full ikea-blue transition-all"></span>
+            <span id="dot-1" class="w-1.5 h-1.5 rounded-full bg-neutral-300 transition-all"></span>
+            <span id="dot-2" class="w-1.5 h-1.5 rounded-full bg-neutral-300 transition-all"></span>
+          </div>
+
+          <div class="flex gap-2">
+            <button id="btn-prev-slide" onclick="changeSlide(-1)" class="hidden flex-1 py-2.5 rounded-full border border-neutral-300 text-xs font-bold text-neutral-700">
+              上一頁
+            </button>
+            <button id="btn-next-slide" onclick="changeSlide(1)" class="flex-1 py-2.5 rounded-full ikea-blue text-white text-xs font-bold">
+              下一頁
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="inspiration-modal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-5">
+      <div class="bg-white w-full max-w-sm max-h-[85vh] rounded-2xl p-6 shadow-xl flex flex-col justify-between overflow-y-auto space-y-4">
+        <div class="flex justify-between items-center border-b border-neutral-200 pb-3">
+          <div>
+            <span class="text-[11px] font-bold text-[#0058A3]">2026 永續智慧創新黑客松</span>
+            <h3 class="text-base font-bold text-neutral-900">專案靈感與團隊介紹</h3>
+          </div>
+          <button onclick="toggleModal('inspiration-modal', false)" class="text-neutral-400 hover:text-black font-bold">✕</button>
+        </div>
+
+        <div class="space-y-3 text-xs text-neutral-700 leading-relaxed">
+          <div class="ikea-gray p-3.5 rounded-lg space-y-1.5">
+            <div class="font-bold text-neutral-900">💡 為什麼我們要做「智鑑家具」？</div>
+            <p>
+              二手家具回購難以規模化，核心痛點在於<b>「逆向物流與人工質檢成本過高」</b>。民眾自拍照片常因光線、角度不一，導致企業無法準確估價；若派車到府回收才發現板材受潮或結構損壞，不僅造成無效碳排，門市現場驗退更易引發客訴。
+            </p>
+          </div>
+
+          <div class="ikea-gray p-3.5 rounded-lg space-y-1.5">
+            <div class="font-bold text-neutral-900">🎯 核心解方：把品管前移到拍照當下</div>
+            <p>
+              透過手機網頁引導消費者拍出規格一致的「1 桌面＋4 桌角」照片，結合 Gemini 多模態模型依三大維度（結構、表面磨損、受潮）進行保守三級初篩，在家具出門前就先判斷「能不能收」，大幅降低人工審核量與無效運輸。
+            </p>
+          </div>
+
+          <div class="border border-neutral-200 p-3.5 rounded-lg space-y-1.5">
+            <div class="font-bold text-neutral-900">🐒 開發團隊：猴子樂園 (Monkeys World)</div>
+            <div class="text-[11px] text-neutral-500">國立臺灣科技大學｜資通科技國際學士學位學程 / 電資學士班</div>
+            <div class="pt-1 text-neutral-800 font-medium">
+              林承翰、蕭宇臻、張瑋家、陳均碩、葉宇森、陳宥廷、陳宥羲
+            </div>
+          </div>
+        </div>
+
+        <button onclick="toggleModal('inspiration-modal', false)" class="w-full py-2.5 rounded-full bg-neutral-900 text-white font-bold text-xs">
+          關閉
+        </button>
+      </div>
+    </div>
+
+    <div id="ios-modal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-end sm:items-center justify-center p-4">
+      <div class="bg-white w-full max-w-sm rounded-xl p-5 shadow-xl space-y-3">
+        <div class="flex justify-between items-center">
+          <h3 class="text-sm font-bold text-neutral-900">將檢測工具加入手機主畫面</h3>
+          <button onclick="toggleModal('ios-modal', false)" class="text-neutral-400 hover:text-black font-bold">✕</button>
+        </div>
+        <p class="text-xs text-neutral-600 leading-relaxed">將網頁加入主畫面後，即可像一般 App 一樣全螢幕開啟相機進行檢測：</p>
+        <div class="ikea-gray p-3.5 rounded-lg space-y-2 text-xs text-neutral-800">
+          <div>1. 點擊 Safari 底部導覽列的 <b>「分享」圖示（方框向上箭頭 📤）</b></div>
+          <div>2. 向下滑動選單，點擊 <b>「加入主畫面」 (Add to Home Screen)</b></div>
+          <div>3. 點擊右上角 <b>「新增」</b> 即可完成</div>
+        </div>
+        <button onclick="toggleModal('ios-modal', false)" class="w-full py-2.5 rounded-full bg-neutral-900 text-white font-bold text-xs">
+          關閉
+        </button>
+      </div>
+    </div>
+
+    <div id="global-loading" class="hidden fixed inset-0 z-50 bg-black/75 flex flex-col items-center justify-center p-6 text-center text-white">
+      <div class="w-9 h-9 border-4 border-[#FFDB00] border-t-transparent rounded-full animate-spin mb-3"></div>
+      <div class="text-sm font-bold">正在分析 5 張家具照片...</div>
+      <div class="text-xs text-neutral-300 mt-1">正在檢查結構、表面磨損與受潮狀況</div>
+    </div>
+
+    <div id="screen-home" class="flex-1 flex flex-col justify-between p-6 overflow-y-auto">
+      <div>
+        <div class="flex items-center justify-between">
+          <p class="text-xs font-bold text-[#0058A3] tracking-wide">二手家具遠端智慧質檢系統</p>
+          <button onclick="toggleModal('inspiration-modal', true)" class="text-[11px] font-bold text-neutral-500 underline">關於專案靈感</button>
+        </div>
+        <h1 class="text-2xl font-bold mt-1 text-neutral-900 leading-snug">線上家具狀況檢測</h1>
+        <p class="text-neutral-600 text-xs mt-1.5 leading-relaxed">
+          把品質控制移到拍照當下。透過 5 張標準視角照片，由 AI 進行三級初篩與殘值預估，減少白跑一趟的運輸碳排。
+        </p>
+
+        <div class="mt-4 ikea-gray p-4 rounded-lg">
+          <div class="flex justify-between items-start">
+            <div>
+              <span class="text-[11px] text-neutral-500">檢測品項（新品參考價 $990）</span>
+              <h2 class="text-base font-bold text-neutral-900 mt-0.5">IKEA LACK 方桌 / 書桌系列</h2>
+            </div>
+            <span class="text-xs font-bold px-2.5 py-1 bg-white rounded text-neutral-700 border border-neutral-200">需 5 張照片</span>
+          </div>
+
+          <div class="mt-3 pt-3 border-t border-neutral-200/80 space-y-1.5 text-xs text-neutral-700">
+            <div class="flex gap-2">
+              <span class="font-bold text-neutral-900">照片 1.</span>
+              <span><b>桌面整體（desktop）</b>：由上方或斜上方拍攝完整桌面</span>
+            </div>
+            <div class="flex gap-2">
+              <span class="font-bold text-neutral-900">照片 2 - 5.</span>
+              <span><b>四個桌角（corner 1~4）</b>：依序拍攝左前、左後、右後、右前桌角</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <h3 class="text-xs font-bold text-neutral-500 mb-2">三大檢測維度（0 良好 ～ 3 嚴重）</h3>
+          <div class="grid grid-cols-3 gap-2">
+            <div class="ikea-gray p-3 rounded-lg">
+              <div class="text-xs font-bold text-neutral-900">結構完整性</div>
+              <div class="text-[11px] text-neutral-500 mt-0.5">桌腳與接合處</div>
+            </div>
+            <div class="ikea-gray p-3 rounded-lg">
+              <div class="text-xs font-bold text-neutral-900">表面磨損</div>
+              <div class="text-[11px] text-neutral-500 mt-0.5">刮痕、掉漆、缺角</div>
+            </div>
+            <div class="ikea-gray p-3 rounded-lg">
+              <div class="text-xs font-bold text-neutral-900">材質受潮</div>
+              <div class="text-[11px] text-neutral-500 mt-0.5">水漬、起泡、膨脹</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-4 space-y-2">
+        <button onclick="startFlow()" class="w-full py-3.5 rounded-full font-bold text-sm ikea-blue text-white active:opacity-90 transition">
+          開始拍攝或上傳照片
+        </button>
+        <button onclick="document.getElementById('batch-upload').click()" class="w-full py-3 rounded-full font-bold text-sm bg-white text-neutral-900 border border-neutral-400 hover:border-black transition">
+          直接從相簿選取 5 張照片
+        </button>
+        <button onclick="testBackendFolderImages()" class="w-full py-2.5 rounded-full font-bold text-xs ikea-gray text-neutral-700 border border-neutral-300 hover:bg-neutral-200 transition">
+          測試
+        </button>
+        <input type="file" id="batch-upload" accept="image/*" multiple class="hidden" onchange="handleBatchUpload(event)">
+      </div>
+    </div>
+
+    <div id="screen-camera" class="hidden flex-1 flex flex-col justify-between bg-white overflow-hidden">
+      
+      <div class="px-5 py-3 bg-white border-b border-neutral-100 shrink-0">
+        <div class="flex justify-between items-center">
+          <span id="step-badge" class="text-xs font-bold text-[#0058A3]">照片 1 / 5：桌面整體 (desktop)</span>
+          <span id="light-indicator" class="text-xs text-neutral-500">光線正常</span>
+        </div>
+        <p id="prompt-text" class="text-sm font-bold text-neutral-900 mt-1">請由上方或斜上方拍攝完整桌面</p>
+      </div>
+
+      <div class="relative flex-1 bg-neutral-900 flex items-center justify-center overflow-hidden">
+        <video id="video" autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover"></video>
+        <canvas id="calc-canvas" class="hidden"></canvas>
+
+        <div class="relative z-10 w-64 h-64 pointer-events-none flex items-center justify-center">
+          <svg id="svg-desktop" viewBox="0 0 240 240" class="w-full h-full stroke-white/90 fill-none" stroke-width="2">
+            <rect x="28" y="28" width="184" height="184" rx="8" stroke-dasharray="6,6"/>
+            <line x1="108" y1="120" x2="132" y2="120"/>
+            <line x1="120" y1="108" x2="120" y2="132"/>
+          </svg>
+
+          <svg id="svg-corner" viewBox="0 0 240 240" class="hidden w-full h-full stroke-white/85 fill-none" stroke-width="3" stroke-linecap="round">
+            <path d="M 40 75 L 40 40 L 75 40" />
+            <path d="M 165 40 L 200 40 L 200 75" />
+            <path d="M 40 165 L 40 200 L 75 200" />
+            <path d="M 165 200 L 200 200 L 200 165" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="p-4 bg-white border-t border-neutral-200 space-y-3 shrink-0">
+        <div class="grid grid-cols-5 gap-2" id="thumbs-grid">
+          <div onclick="selectStep(0)" class="cursor-pointer aspect-square rounded bg-neutral-100 border-2 border-[#0058A3] flex items-center justify-center text-[11px] font-medium text-neutral-500 overflow-hidden relative">1.桌面</div>
+          <div onclick="selectStep(1)" class="cursor-pointer aspect-square rounded bg-neutral-100 border border-neutral-200 flex items-center justify-center text-[11px] font-medium text-neutral-500 overflow-hidden relative">2.左前角</div>
+          <div onclick="selectStep(2)" class="cursor-pointer aspect-square rounded bg-neutral-100 border border-neutral-200 flex items-center justify-center text-[11px] font-medium text-neutral-500 overflow-hidden relative">3.左後角</div>
+          <div onclick="selectStep(3)" class="cursor-pointer aspect-square rounded bg-neutral-100 border border-neutral-200 flex items-center justify-center text-[11px] font-medium text-neutral-500 overflow-hidden relative">4.右後角</div>
+          <div onclick="selectStep(4)" class="cursor-pointer aspect-square rounded bg-neutral-100 border border-neutral-200 flex items-center justify-center text-[11px] font-medium text-neutral-500 overflow-hidden relative">5.右前角</div>
+        </div>
+
+        <div class="flex gap-2.5">
+          <button onclick="document.getElementById('single-upload').click()" class="flex-1 py-3 rounded-full font-bold text-xs bg-white text-neutral-900 border border-neutral-400 active:bg-neutral-100">
+            從相簿選圖
+          </button>
+          <input type="file" id="single-upload" accept="image/*" class="hidden" onchange="handleSingleUpload(event)">
+
+          <button onclick="triggerCapture()" class="flex-1 py-3 rounded-full font-bold text-xs ikea-blue text-white active:opacity-90">
+            拍攝此角度
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="screen-result" class="hidden flex-1 flex flex-col justify-between p-5 bg-white overflow-y-auto">
+      <div class="space-y-4">
+        
+        <div class="flex justify-between items-center border-b border-neutral-200 pb-3">
+          <span id="source-tag" class="text-xs font-bold text-neutral-500">評估結果</span>
+          <div class="flex gap-1.5">
+            <button onclick="switchResult('pass')" class="text-xs px-2.5 py-1 rounded bg-neutral-100 hover:bg-neutral-200 font-medium text-neutral-800">pass</button>
+            <button onclick="switchResult('review')" class="text-xs px-2.5 py-1 rounded bg-neutral-100 hover:bg-neutral-200 font-medium text-neutral-800">review</button>
+            <button onclick="switchResult('reject')" class="text-xs px-2.5 py-1 rounded bg-neutral-100 hover:bg-neutral-200 font-medium text-neutral-800">reject</button>
+          </div>
+        </div>
+
+        <div class="ikea-gray p-5 rounded-lg border-l-4 border-[#0058A3]" id="result-card">
+          <div class="flex justify-between items-center">
+            <span id="result-badge" class="text-xs font-bold px-2.5 py-0.5 rounded bg-[#0058A3] text-white">符合收購標準 (pass)</span>
+            <span id="confidence-tag" class="text-xs text-neutral-500">把握度：92%</span>
+          </div>
+          <div class="mt-3 flex items-baseline justify-between">
+            <div>
+              <div class="text-xs text-neutral-500">預估收購價值</div>
+              <div id="result-title" class="text-3xl font-black text-neutral-900 mt-0.5">NT$ 450</div>
+            </div>
+            <span id="price-formula" class="text-[11px] text-neutral-500">基準 $500 - 輕微磨損 $50</span>
+          </div>
+          <p id="result-desc" class="text-xs text-neutral-700 mt-3 leading-relaxed font-medium"></p>
+          <p id="retake-box" class="hidden text-xs text-amber-800 bg-amber-100/80 border border-amber-300 rounded p-2 mt-2"></p>
+        </div>
+
+        <div id="action-pass" class="hidden border border-neutral-200 rounded-lg p-4 space-y-3 bg-white">
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded ikea-yellow text-neutral-900">🌱 低碳自送獎勵 +$50</span>
+              <h4 class="text-sm font-bold text-neutral-900 mt-1.5">親送至 IKEA 門市可獲 NT$ <span id="self-drop-price">500</span> 折價券</h4>
+              <p class="text-xs text-neutral-600 mt-0.5 leading-relaxed">免除專車到府收件的逆向物流碳排，將家具順路載至門市「特價品區 (AS-IS)」櫃檯即可現場核發。</p>
+            </div>
+          </div>
+
+          <div class="pt-2 border-t border-neutral-100 space-y-2">
+            <div class="text-xs font-bold text-neutral-800">全台收購服務門市一覽：</div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <a href="https://maps.google.com/?q=IKEA宜家家居內湖店" target="_blank" class="ikea-gray p-2.5 rounded hover:bg-neutral-200 flex justify-between items-center">
+                <span>📍 台北內湖店</span><span class="text-[#0058A3] font-bold">導航</span>
+              </a>
+              <a href="https://maps.google.com/?q=IKEA宜家家居新莊店" target="_blank" class="ikea-gray p-2.5 rounded hover:bg-neutral-200 flex justify-between items-center">
+                <span>📍 新北新莊店</span><span class="text-[#0058A3] font-bold">導航</span>
+              </a>
+              <a href="https://maps.google.com/?q=IKEA宜家家居新店店" target="_blank" class="ikea-gray p-2.5 rounded hover:bg-neutral-200 flex justify-between items-center">
+                <span>📍 新北新店店</span><span class="text-[#0058A3] font-bold">導航</span>
+              </a>
+              <a href="https://maps.google.com/?q=IKEA宜家家居桃園店" target="_blank" class="ikea-gray p-2.5 rounded hover:bg-neutral-200 flex justify-between items-center">
+                <span>📍 桃園青埔店</span><span class="text-[#0058A3] font-bold">導航</span>
+              </a>
+              <a href="https://maps.google.com/?q=IKEA宜家家居台中店" target="_blank" class="ikea-gray p-2.5 rounded hover:bg-neutral-200 flex justify-between items-center">
+                <span>📍 台中南屯店</span><span class="text-[#0058A3] font-bold">導航</span>
+              </a>
+              <a href="https://maps.google.com/?q=IKEA宜家家居高雄店" target="_blank" class="ikea-gray p-2.5 rounded hover:bg-neutral-200 flex justify-between items-center">
+                <span>📍 高雄前鎮店</span><span class="text-[#0058A3] font-bold">導航</span>
+              </a>
+            </div>
+            <div class="text-[11px] text-neutral-500 pt-1">客服專線：412-8869（手機撥打請加 02）｜服務時間 9:00 - 18:00</div>
+          </div>
+        </div>
+
+        <div id="action-review" class="hidden border border-amber-300 bg-amber-50/50 rounded-lg p-4 space-y-3">
+          <div>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-amber-400 text-neutral-900">🔍 協助專員快速判定</span>
+            <h4 class="text-sm font-bold text-neutral-900 mt-1.5">請針對系統標記之疑點部位補拍特寫或短片</h4>
+            <p class="text-xs text-neutral-600 mt-0.5 leading-relaxed">補傳局部近照或 2 秒輕晃短片可加速人工複核，避免將家具白跑載至門市後遭驗退：</p>
+          </div>
+          <div id="review-defect-prompts" class="space-y-2 text-xs"></div>
+          <div id="extra-thumbs" class="flex gap-2 flex-wrap"></div>
+          <input type="file" id="extra-upload" accept="image/*,video/*" multiple class="hidden" onchange="handleExtraUpload(event)">
+          <div class="flex gap-2">
+            <button onclick="document.getElementById('extra-upload').click()" class="flex-1 py-2.5 rounded-full bg-white border border-neutral-400 font-bold text-xs text-neutral-900">
+              ＋ 補傳近照 / 2秒輕晃短片
+            </button>
+            <button onclick="submitHumanReview()" id="btn-submit-review" class="flex-1 py-2.5 rounded-full ikea-blue text-white font-bold text-xs">
+              送出人工審核申請
+            </button>
+          </div>
+        </div>
+
+        <div id="action-reject" class="hidden border border-neutral-200 rounded-lg p-4 space-y-3 bg-white">
+          <div>
+            <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-neutral-200 text-neutral-800">♻️ 永續循環替代方案</span>
+            <h4 class="text-sm font-bold text-neutral-900 mt-1.5">此家具不符二手收購，建議採行以下管道：</h4>
+          </div>
+          <div class="space-y-2 text-xs">
+            <div class="ikea-gray p-3 rounded-lg">
+              <div class="font-bold text-neutral-900">1. 申請 IKEA 免費五金零件 / 局部維修</div>
+              <p class="text-neutral-600 mt-0.5">若您希望留用家具，可至門市客服櫃檯索取替換螺絲與木榫，或洽詢局部零件維修。</p>
+            </div>
+            <div class="ikea-gray p-3 rounded-lg flex justify-between items-center gap-2">
+              <div>
+                <div class="font-bold text-neutral-900">2. 各縣市環保局大型廢棄物預約清運</div>
+                <p class="text-neutral-600 mt-0.5">板材受潮或嚴重破損請撥打 <b>1999 市民專線</b>，或透過環境部資源循環署網站預約免費到府清運。</p>
+              </div>
+              <a href="https://recycle.moenv.gov.tw/" target="_blank" class="shrink-0 px-3 py-1.5 rounded-full bg-neutral-900 text-white font-bold">前往預約</a>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="text-xs font-bold text-neutral-700 mb-2">5 張檢驗照片（對應 view 1～5）</div>
+          <div id="result-thumbs" class="grid grid-cols-5 gap-2"></div>
+        </div>
+
+        <div class="ikea-gray p-4 rounded-lg space-y-3">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold text-neutral-800">三大維度評分（0 良好 ～ 3 嚴重）</span>
+          </div>
+          
+          <div class="bg-white p-3 rounded border border-neutral-200/80">
+            <div class="flex justify-between text-xs">
+              <span class="font-bold text-neutral-800">1. 結構 (structure)</span>
+              <span id="score-structure" class="font-bold text-[#0058A3]">0 級（良好）</span>
+            </div>
+            <p id="note-structure" class="text-xs text-neutral-500 mt-1"></p>
+          </div>
+
+          <div class="bg-white p-3 rounded border border-neutral-200/80">
+            <div class="flex justify-between text-xs">
+              <span class="font-bold text-neutral-800">2. 表面磨損 (surface_wear)</span>
+              <span id="score-surface" class="font-bold text-[#0058A3]">1 級（輕微）</span>
+            </div>
+            <p id="note-surface" class="text-xs text-neutral-500 mt-1"></p>
+          </div>
+
+          <div class="bg-white p-3 rounded border border-neutral-200/80">
+            <div class="flex justify-between text-xs">
+              <span class="font-bold text-neutral-800">3. 受潮狀況 (water_damage)</span>
+              <span id="score-water" class="font-bold text-[#0058A3]">0 級（良好）</span>
+            </div>
+            <p id="note-water" class="text-xs text-neutral-500 mt-1"></p>
+          </div>
+        </div>
+
+        <div id="defects-section" class="ikea-gray p-4 rounded-lg space-y-2">
+          <div class="text-xs font-bold text-neutral-800">偵測到的缺陷清單 (defects)</div>
+          <div id="defects-list" class="space-y-1.5 text-xs"></div>
+        </div>
+
+        <details class="ikea-gray rounded-lg p-3 text-xs">
+          <summary class="font-bold text-neutral-700 cursor-pointer">檢視 JSON</summary>
+          <pre id="json-viewer" class="mt-2 p-3 rounded bg-white border border-neutral-200 text-neutral-800 font-mono text-[11px] overflow-x-auto"></pre>
+        </details>
+      </div>
+
+      <button onclick="location.reload()" class="w-full py-3.5 mt-5 rounded-full bg-neutral-900 text-white font-bold text-sm">
+        完成並返回首頁
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+    const BACKEND_BASE = window.location.port === "8000" || window.location.hostname.includes("onrender.com")
+      ? window.location.origin
+      : "http://localhost:8000";
+
+    const steps = [
+      { badge: "照片 1 / 5：桌面整體 (desktop)", prompt: "請由上方或斜上方拍攝完整桌面", mode: "desktop" },
+      { badge: "照片 2 / 5：左前桌角 (corner_1)", prompt: "請對準面對桌子正面的「左前桌角」拍攝特寫", mode: "corner" },
+      { badge: "照片 3 / 5：左後桌角 (corner_2)", prompt: "請對準「左後桌角」與接縫處拍攝特寫", mode: "corner" },
+      { badge: "照片 4 / 5：右後桌角 (corner_3)", prompt: "請對準「右後桌角」與接縫處拍攝特寫", mode: "corner" },
+      { badge: "照片 5 / 5：右前桌角 (corner_4)", prompt: "請對準「右前桌角」與接縫處拍攝特寫", mode: "corner" }
+    ];
+
+    const defectTypeMap = {
+      scratch: "刮痕",
+      dent: "凹痕",
+      chip: "缺角",
+      paint_loss: "掉漆",
+      stain: "污漬",
+      water_mark: "水漬",
+      swelling: "膨脹",
+      peeling: "脫皮",
+      crack: "裂縫",
+      loose_joint: "接合鬆脫",
+      missing_part: "缺件",
+      mold: "發霉",
+      other: "其他"
+    };
+
+    const scoreLabelMap = ["0 級（良好）", "1 級（輕微）", "2 級（中等）", "3 級（嚴重）"];
+
+    let currentSlide = 0;
+    let currentStep = 0;
+    const capturedImages = [null, null, null, null, null];
+
+    function toggleModal(id, show) {
+      document.getElementById(id).classList.toggle('hidden', !show);
+    }
+
+    function openGuideModal() {
+      currentSlide = 0;
+      updateSlideUI();
+      toggleModal('guide-modal', true);
+    }
+
+    function changeSlide(delta) {
+      if (currentSlide + delta >= 3) {
+        toggleModal('guide-modal', false);
+        return;
+      }
+      currentSlide = Math.max(0, currentSlide + delta);
+      updateSlideUI();
+    }
+
+    function updateSlideUI() {
+      document.getElementById('slide-tag').innerText = `步驟 ${currentSlide + 1} / 3`;
+      [0, 1, 2].forEach(i => {
+        document.getElementById(`slide-${i + 1}`).classList.toggle('hidden', i !== currentSlide);
+        const dot = document.getElementById(`dot-${i}`);
+        dot.className = i === currentSlide
+          ? "w-5 h-1.5 rounded-full ikea-blue transition-all"
+          : "w-1.5 h-1.5 rounded-full bg-neutral-300 transition-all";
+      });
+      document.getElementById('btn-prev-slide').classList.toggle('hidden', currentSlide === 0);
+      document.getElementById('btn-next-slide').innerText = currentSlide === 2 ? "開始使用" : "下一頁";
+    }
+
+    async function testBackendFolderImages() {
+      const loading = document.getElementById('global-loading');
+      loading.classList.remove('hidden');
+      try {
+        const res = await fetch(`${BACKEND_BASE}/analyze-test-images`);
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.detail || "後端錯誤");
+        }
+        const realData = await res.json();
+        if (realData.preview_images) {
+          realData.preview_images.forEach((img, idx) => { capturedImages[idx] = img; });
+          delete realData.preview_images;
+        }
+        loading.classList.add('hidden');
+        document.getElementById('screen-home').classList.add('hidden');
+        document.getElementById('screen-result').classList.remove('hidden');
+        document.getElementById('source-tag').innerText = "評估結果（已連接 Python Gemini 後端）";
+        renderResultThumbnails();
+        renderInspectResult(realData);
+      } catch (e) {
+        loading.classList.add('hidden');
+        alert(`無法連接後端 (${e.message})。\n請確認 VS Code 終端機有執行 python server.py！`);
+      }
+    }
+
+    async function startFlow() {
+      document.getElementById('screen-home').classList.add('hidden');
+      document.getElementById('screen-camera').classList.remove('hidden');
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 960 } },
+          audio: false
+        });
+        document.getElementById('video').srcObject = stream;
+        startLightMonitor();
+      } catch (err) {
+        document.getElementById('light-indicator').innerText = "相簿上傳模式";
+      }
+    }
+
+    function startLightMonitor() {
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('calc-canvas');
+      const ctx = canvas.getContext('2d');
+      const indicator = document.getElementById('light-indicator');
+
+      setInterval(() => {
+        if (!video.videoWidth) return;
+        canvas.width = 50; canvas.height = 50;
+        ctx.drawImage(video, 0, 0, 50, 50);
+        const data = ctx.getImageData(0, 0, 50, 50).data;
+        let sum = 0;
+        for (let i = 0; i < data.length; i += 4) {
+          sum += (0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2]);
+        }
+        const avg = sum / 2500;
+        if (avg < 55) indicator.innerText = "光線偏暗";
+        else if (avg > 225) indicator.innerText = "反光過強";
+        else indicator.innerText = "光線正常";
+      }, 700);
+    }
+
+    function selectStep(index) {
+      currentStep = index;
+      updateStepUI();
+    }
+
+    function updateStepUI() {
+      const info = steps[currentStep];
+      document.getElementById('step-badge').innerText = info.badge;
+      document.getElementById('prompt-text').innerText = info.prompt;
+
+      const svgDesktop = document.getElementById('svg-desktop');
+      const svgCorner = document.getElementById('svg-corner');
+      if (info.mode === 'desktop') {
+        svgDesktop.classList.remove('hidden');
+        svgCorner.classList.add('hidden');
+      } else {
+        svgDesktop.classList.add('hidden');
+        svgCorner.classList.remove('hidden');
+      }
+
+      const slots = document.getElementById('thumbs-grid').children;
+      for (let i = 0; i < 5; i++) {
+        slots[i].classList.toggle('border-2', i === currentStep);
+        slots[i].classList.toggle('border-[#0058A3]', i === currentStep);
+      }
+    }
+
+    function triggerCapture() {
+      const video = document.getElementById('video');
+      const canvas = document.getElementById('calc-canvas');
+      const ctx = canvas.getContext('2d');
+
+      let dataUrl = "";
+      if (video.videoWidth) {
+        canvas.width = 600; canvas.height = 600;
+        ctx.drawImage(video, 0, 0, 600, 600);
+        dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      }
+      saveStepImage(dataUrl);
+    }
+
+    function handleSingleUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        saveStepImage(e.target.result);
+        event.target.value = '';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleBatchUpload(event) {
+      const files = Array.from(event.target.files).slice(0, 5);
+      if (!files.length) return;
+      document.getElementById('screen-home').classList.add('hidden');
+      document.getElementById('screen-camera').classList.remove('hidden');
+
+      let loadedCount = 0;
+      files.forEach((file, idx) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          capturedImages[idx] = e.target.result;
+          renderSlotThumb(idx, e.target.result);
+          loadedCount++;
+          if (loadedCount === files.length) {
+            if (files.length === 5) goToResult();
+            else selectStep(files.length);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function renderSlotThumb(idx, dataUrl) {
+      const slot = document.getElementById('thumbs-grid').children[idx];
+      if (dataUrl) {
+        slot.innerHTML = `<img src="${dataUrl}" class="w-full h-full object-cover"/>`;
+      } else {
+        slot.innerHTML = `<span class="text-xs font-bold text-[#0058A3]">✓</span>`;
+      }
+    }
+
+    function saveStepImage(dataUrl) {
+      capturedImages[currentStep] = dataUrl || "captured";
+      renderSlotThumb(currentStep, dataUrl);
+
+      const nextEmpty = capturedImages.findIndex(img => img === null);
+      if (nextEmpty !== -1) {
+        selectStep(nextEmpty);
+      } else {
+        goToResult();
+      }
+    }
+
+    function renderResultThumbnails() {
+      const labels = ["1.桌面", "2.左前角", "3.左後角", "4.右後角", "5.右前角"];
+      document.getElementById('result-thumbs').innerHTML = capturedImages.map((img, i) => `
+        <div class="aspect-square rounded bg-neutral-100 border border-neutral-200 overflow-hidden relative flex items-center justify-center">
+          ${img && img.startsWith('data:') ? `<img src="${img}" class="w-full h-full object-cover"/>` : `<span class="text-[11px] text-neutral-500">${labels[i]}</span>`}
+        </div>
+      `).join('');
+    }
+
+    async function goToResult() {
+      const loading = document.getElementById('global-loading');
+      loading.classList.remove('hidden');
+      renderResultThumbnails();
+
+      const hasRealImages = capturedImages.every(img => img && img.startsWith('data:'));
+      if (hasRealImages) {
+        try {
+          const res = await fetch(`${BACKEND_BASE}/analyze`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ images: capturedImages })
+          });
+          if (res.ok) {
+            const realData = await res.json();
+            loading.classList.add('hidden');
+            document.getElementById('screen-camera').classList.add('hidden');
+            document.getElementById('screen-result').classList.remove('hidden');
+            document.getElementById('source-tag').innerText = "評估結果（已連接 Python Gemini 後端）";
+            renderInspectResult(realData);
+            return;
+          }
+        } catch (e) {}
+      }
+
+      setTimeout(() => {
+        loading.classList.add('hidden');
+        document.getElementById('screen-camera').classList.add('hidden');
+        document.getElementById('screen-result').classList.remove('hidden');
+        switchResult('pass');
+      }, 600);
+    }
+
+    function decideByRules(data) {
+      const scores = [
+        data.dimensions.structure.score,
+        data.dimensions.surface_wear.score,
+        data.dimensions.water_damage.score
+      ];
+      if (Math.max(...scores) === 3 || data.overall === "reject") return "reject";
+      if (data.need_retake || Math.max(...scores) === 2 || data.confidence < 0.7 || data.overall !== "pass") return "review";
+      return "pass";
+    }
+
+    function calculatePrice(data, finalDecision) {
+      if (finalDecision === "reject") return { numeric: 0, priceText: "NT$ 0", formula: "嚴重受損不予收購" };
+      if (finalDecision === "review") return { numeric: null, priceText: "轉交人工核價", formula: "待專員確認瑕疵照片" };
+      const base = 500;
+      const deduction =
+        data.dimensions.structure.score * 80 +
+        data.dimensions.surface_wear.score * 50 +
+        data.dimensions.water_damage.score * 70;
+      const finalPrice = Math.max(100, base - deduction);
+      return {
+        numeric: finalPrice,
+        priceText: `NT$ ${finalPrice}`,
+        formula: deduction > 0 ? `基準 $${base} - 輕微耗損 $${deduction}` : `基準 $${base}（近全新無扣款）`
+      };
+    }
+
+    function switchResult(type) {
+      const mockResults = {
+        pass: {
+          overall: "pass",
+          confidence: 0.92,
+          dimensions: {
+            structure: { score: 0, note: "四個桌角與桌腳接合處穩固，無裂縫或鬆脫" },
+            surface_wear: { score: 1, note: "左前桌角有一處約 1 公分極細微刮痕，不影響整體觀感" },
+            water_damage: { score: 0, note: "桌面與邊緣平整，無受潮起泡或水漬" }
+          },
+          defects: [
+            { type: "scratch", location: "左前桌角表面細微刮痕（約 1cm）", view: 2 }
+          ],
+          reason: "結構與防潮狀況良好，僅左前桌角有極輕微使用刮痕，符合直接收購標準。",
+          need_retake: false,
+          retake_hint: ""
+        },
+        review: {
+          overall: "review",
+          confidence: 0.85,
+          dimensions: {
+            structure: { score: 0, note: "結構完整" },
+            surface_wear: { score: 2, note: "左前桌角有明顯磨損與掉漆" },
+            water_damage: { score: 0, note: "沒有受潮跡象" }
+          },
+          defects: [
+            { type: "paint_loss", location: "左前桌角邊緣約 3 公分磨損露底（亦見於照片 1）", view: 2 }
+          ],
+          reason: "桌角磨損達中等程度（2 級），請針對標記部位補拍近照以利人工確認殘值。",
+          need_retake: false,
+          retake_hint: ""
+        },
+        reject: {
+          overall: "reject",
+          confidence: 0.95,
+          dimensions: {
+            structure: { score: 2, note: "右後桌角接合處有輕微開縫" },
+            surface_wear: { score: 2, note: "桌面及邊角有多處脫皮" },
+            water_damage: { score: 3, note: "左後與右後桌角板材受潮嚴重膨脹變形" }
+          },
+          defects: [
+            { type: "swelling", location: "左後桌角板材受潮膨脹變形、邊緣鬆散（亦見於照片 1）", view: 3 },
+            { type: "peeling", location: "右後桌角貼皮大面積翹起脫落", view: 4 }
+          ],
+          reason: "桌角板材出現嚴重受潮膨脹與貼皮脫落（3 級），影響後續使用安全與壽命，不予收購。",
+          need_retake: false,
+          retake_hint: ""
+        }
+      };
+
+      renderInspectResult(mockResults[type]);
+    }
+
+    function renderInspectResult(data) {
+      const finalDecision = data.final_decision || decideByRules(data);
+      const priceInfo = calculatePrice(data, finalDecision);
+
+      const card = document.getElementById('result-card');
+      const badge = document.getElementById('result-badge');
+      const conf = document.getElementById('confidence-tag');
+      const title = document.getElementById('result-title');
+      const formula = document.getElementById('price-formula');
+      const desc = document.getElementById('result-desc');
+      const retakeBox = document.getElementById('retake-box');
+
+      conf.innerText = `把握度：${Math.round(data.confidence * 100)}%`;
+      title.innerText = priceInfo.priceText;
+      formula.innerText = priceInfo.formula;
+      desc.innerText = data.reason;
+
+      if (data.need_retake && data.retake_hint) {
+        retakeBox.classList.remove('hidden');
+        retakeBox.innerText = `📸 需補拍提示：${data.retake_hint}`;
+      } else {
+        retakeBox.classList.add('hidden');
+      }
+
+      document.getElementById('action-pass').classList.toggle('hidden', finalDecision !== 'pass');
+      document.getElementById('action-review').classList.toggle('hidden', finalDecision !== 'review');
+      document.getElementById('action-reject').classList.toggle('hidden', finalDecision !== 'reject');
+
+      if (finalDecision === 'pass') {
+        card.className = "ikea-gray p-5 rounded-lg border-l-4 border-[#0058A3]";
+        badge.className = "text-xs font-bold px-2.5 py-0.5 rounded bg-[#0058A3] text-white";
+        badge.innerText = "符合收購標準 (pass)";
+        document.getElementById('self-drop-price').innerText = priceInfo.numeric + 50;
+      } else if (finalDecision === 'review') {
+        card.className = "ikea-gray p-5 rounded-lg border-l-4 border-amber-500";
+        badge.className = "text-xs font-bold px-2.5 py-0.5 rounded bg-amber-400 text-black";
+        badge.innerText = "需人工複核 (review)";
+        renderReviewPrompts(data);
+      } else {
+        card.className = "ikea-gray p-5 rounded-lg border-l-4 border-red-600";
+        badge.className = "text-xs font-bold px-2.5 py-0.5 rounded bg-red-600 text-white";
+        badge.innerText = "無法收購 (reject)";
+      }
+
+      const d = data.dimensions;
+      document.getElementById('score-structure').innerText = scoreLabelMap[d.structure.score];
+      document.getElementById('note-structure').innerText = d.structure.note;
+
+      document.getElementById('score-surface').innerText = scoreLabelMap[d.surface_wear.score];
+      document.getElementById('note-surface').innerText = d.surface_wear.note;
+
+      document.getElementById('score-water').innerText = scoreLabelMap[d.water_damage.score];
+      document.getElementById('note-water').innerText = d.water_damage.note;
+
+      const defectsList = document.getElementById('defects-list');
+      if (!data.defects || data.defects.length === 0) {
+        defectsList.innerHTML = `<div class="text-neutral-500">無明顯缺陷</div>`;
+      } else {
+        defectsList.innerHTML = data.defects.map(item => `
+          <div class="bg-white p-2.5 rounded border border-neutral-200 flex justify-between items-start gap-2">
+            <div>
+              <span class="font-bold text-neutral-900">[${defectTypeMap[item.type] || item.type}]</span>
+              <span class="text-neutral-600 ml-1">${item.location}</span>
+            </div>
+            <span class="shrink-0 px-2 py-0.5 bg-neutral-100 rounded text-[11px] font-medium text-neutral-700">照片 ${item.view}</span>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('json-viewer').innerText = JSON.stringify(data, null, 2);
+    }
+
+    function renderReviewPrompts(data) {
+      const box = document.getElementById('review-defect-prompts');
+      document.getElementById('extra-thumbs').innerHTML = '';
+      const btn = document.getElementById('btn-submit-review');
+      btn.innerText = "送出人工審核申請";
+      btn.disabled = false;
+
+      if (data.defects && data.defects.length > 0) {
+        box.innerHTML = data.defects.map(item => `
+          <div class="bg-white p-2.5 rounded border border-amber-200 text-neutral-800">
+            📍 請針對 <b>照片 ${item.view}（${defectTypeMap[item.type] || item.type}：${item.location}）</b> 距離 15 公分補拍清晰近照。
+          </div>
+        `).join('');
+      } else {
+        box.innerHTML = `<div class="bg-white p-2.5 rounded border border-amber-200 text-neutral-800">📍 請針對反光或模糊部位補拍清晰照片。</div>`;
+      }
+    }
+
+    function handleExtraUpload(event) {
+      const files = Array.from(event.target.files);
+      const container = document.getElementById('extra-thumbs');
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const div = document.createElement('div');
+          div.className = "w-14 h-14 rounded border border-amber-400 overflow-hidden bg-neutral-100 flex items-center justify-center text-[10px]";
+          if (file.type.startsWith('video/')) {
+            div.innerHTML = `<span class="font-bold text-amber-800">🎥 2秒短片</span>`;
+          } else {
+            div.innerHTML = `<img src="${e.target.result}" class="w-full h-full object-cover"/>`;
+          }
+          container.appendChild(div);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function submitHumanReview() {
+      const btn = document.getElementById('btn-submit-review');
+      btn.innerText = "✓ 已送交客服專員（單號 #RV-2026）";
+      btn.disabled = true;
+    }
+  </script>
+</body>
+</html>
