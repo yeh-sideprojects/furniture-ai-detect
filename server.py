@@ -67,7 +67,7 @@ def analyze_furniture(req: AnalyzeRequest):
 
 @app.get("/analyze-test-images")
 def analyze_test_images():
-    image_dir = Path("test/images")
+    image_dir = Path(".")
     image_names = ["desktop.jpg", "corner_1.jpg", "corner_2.jpg", "corner_3.jpg", "corner_4.jpg"]
     image_bytes_list = []
     images_b64 = []
