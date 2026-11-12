@@ -172,8 +172,8 @@
 
     <div id="global-loading" class="hidden fixed inset-0 z-50 bg-black/75 flex flex-col items-center justify-center p-6 text-center text-white">
       <div class="w-9 h-9 border-4 border-[#FFDB00] border-t-transparent rounded-full animate-spin mb-3"></div>
-      <div class="text-sm font-bold">正在分析 5 張家具照片...</div>
-      <div class="text-xs text-neutral-300 mt-1">正在檢查結構、表面磨損與受潮狀況</div>
+      <div class="text-sm font-bold">正在呼叫雲端 Gemini 分析 5 張照片...</div>
+      <div class="text-xs text-neutral-300 mt-1">正在檢查結構、表面磨損與受潮狀況（約需 3～8 秒）</div>
     </div>
 
     <div id="screen-home" class="flex-1 flex flex-col justify-between p-6 overflow-y-auto">
@@ -449,9 +449,9 @@
   </div>
 
   <script>
-    const BACKEND_BASE = window.location.port === "8000" || window.location.hostname.includes("onrender.com")
-      ? window.location.origin
-      : "http://localhost:8000";
+    const BACKEND_BASE = (window.location.port === "5500" || window.location.protocol === "file:")
+      ? "http://localhost:8000"
+      : window.location.origin;
 
     const steps = [
       { badge: "照片 1 / 5：桌面整體 (desktop)", prompt: "請由上方或斜上方拍攝完整桌面", mode: "desktop" },
@@ -521,8 +521,8 @@
       try {
         const res = await fetch(`${BACKEND_BASE}/analyze-test-images`);
         if (!res.ok) {
-          const err = await res.json();
-          throw new Error(err.detail || "後端錯誤");
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.detail || `HTTP ${res.status}`);
         }
         const realData = await res.json();
         if (realData.preview_images) {
@@ -537,7 +537,7 @@
         renderInspectResult(realData);
       } catch (e) {
         loading.classList.add('hidden');
-        alert(`無法連接後端 (${e.message})。\n請確認 VS Code 終端機有執行 python server.py！`);
+        alert(`測試失敗：${e.message}\n請檢查 Render 環境變數 GEMINI_API_KEY 與照片檔案是否已上傳！`);
       }
     }
 
@@ -605,51 +605,67 @@
       }
     }
 
+    function compressImageFile(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const maxDim = 800;
+            let w = img.width, h = img.height;
+            if (w > maxDim || h > maxDim) {
+              if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+              else { w = Math.round((w * maxDim) / h); h = maxDim; }
+            }
+            canvas.width = w;
+            canvas.height = h;
+            canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+            resolve(canvas.toDataURL('image/jpeg', 0.7));
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
     function triggerCapture() {
       const video = document.getElementById('video');
       const canvas = document.getElementById('calc-canvas');
       const ctx = canvas.getContext('2d');
 
-      let dataUrl = "";
-      if (video.videoWidth) {
-        canvas.width = 600; canvas.height = 600;
-        ctx.drawImage(video, 0, 0, 600, 600);
-        dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      if (!video.videoWidth) {
+        alert("目前未開啟相機鏡頭，請點左邊「從相簿選圖」選取照片！");
+        return;
       }
+      canvas.width = 600;
+      canvas.height = 600;
+      ctx.drawImage(video, 0, 0, 600, 600);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
       saveStepImage(dataUrl);
     }
 
-    function handleSingleUpload(event) {
+    async function handleSingleUpload(event) {
       const file = event.target.files[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        saveStepImage(e.target.result);
-        event.target.value = '';
-      };
-      reader.readAsDataURL(file);
+      const compressed = await compressImageFile(file);
+      saveStepImage(compressed);
+      event.target.value = '';
     }
 
-    function handleBatchUpload(event) {
+    async function handleBatchUpload(event) {
       const files = Array.from(event.target.files).slice(0, 5);
       if (!files.length) return;
       document.getElementById('screen-home').classList.add('hidden');
       document.getElementById('screen-camera').classList.remove('hidden');
 
-      let loadedCount = 0;
-      files.forEach((file, idx) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          capturedImages[idx] = e.target.result;
-          renderSlotThumb(idx, e.target.result);
-          loadedCount++;
-          if (loadedCount === files.length) {
-            if (files.length === 5) goToResult();
-            else selectStep(files.length);
-          }
-        };
-        reader.readAsDataURL(file);
-      });
+      for (let idx = 0; idx < files.length; idx++) {
+        const compressed = await compressImageFile(files[idx]);
+        capturedImages[idx] = compressed;
+        renderSlotThumb(idx, compressed);
+      }
+      if (files.length === 5) goToResult();
+      else selectStep(files.length);
     }
 
     function renderSlotThumb(idx, dataUrl) {
@@ -662,7 +678,7 @@
     }
 
     function saveStepImage(dataUrl) {
-      capturedImages[currentStep] = dataUrl || "captured";
+      capturedImages[currentStep] = dataUrl;
       renderSlotThumb(currentStep, dataUrl);
 
       const nextEmpty = capturedImages.findIndex(img => img === null);
@@ -687,32 +703,26 @@
       loading.classList.remove('hidden');
       renderResultThumbnails();
 
-      const hasRealImages = capturedImages.every(img => img && img.startsWith('data:'));
-      if (hasRealImages) {
-        try {
-          const res = await fetch(`${BACKEND_BASE}/analyze`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ images: capturedImages })
-          });
-          if (res.ok) {
-            const realData = await res.json();
-            loading.classList.add('hidden');
-            document.getElementById('screen-camera').classList.add('hidden');
-            document.getElementById('screen-result').classList.remove('hidden');
-            document.getElementById('source-tag').innerText = "評估結果（已連接 Python Gemini 後端）";
-            renderInspectResult(realData);
-            return;
-          }
-        } catch (e) {}
-      }
-
-      setTimeout(() => {
+      try {
+        const res = await fetch(`${BACKEND_BASE}/analyze`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ images: capturedImages })
+        });
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.detail || `HTTP 狀態碼 ${res.status}`);
+        }
+        const realData = await res.json();
         loading.classList.add('hidden');
         document.getElementById('screen-camera').classList.add('hidden');
         document.getElementById('screen-result').classList.remove('hidden');
-        switchResult('pass');
-      }, 600);
+        document.getElementById('source-tag').innerText = "評估結果（已連接 Python Gemini 後端）";
+        renderInspectResult(realData);
+      } catch (e) {
+        loading.classList.add('hidden');
+        alert(`呼叫後端 Gemini 失敗：${e.message}\n\n請點擊第 5 張照片縮圖重新送出，或確認 Render 後台的 GEMINI_API_KEY 已正確設定。`);
+      }
     }
 
     function decideByRules(data) {
